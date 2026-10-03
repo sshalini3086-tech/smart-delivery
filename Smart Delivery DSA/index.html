@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Delivery - DSA Visualizer</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #eef3f8;
+    color: #172033;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(135deg, #101c36, #1d4ed8);
+    color: white;
+    padding: 35px 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 17px;
+    opacity: 0.9;
+}
+
+/* NAVIGATION */
+nav {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav button {
+    padding: 10px 18px;
+    margin: 5px;
+    border: none;
+    border-radius: 20px;
+    background: #e8eefc;
+    color: #1743a5;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+nav button:hover {
+    background: #2563eb;
+    color: white;
+}
+
+/* CONTAINER */
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 15px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.card h3 {
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.card .number {
+    font-size: 30px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* SECTIONS */
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+.section h2 {
+    margin-bottom: 20px;
+    color: #1e3a8a;
+}
+
+/* CONTROLS */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input, select {
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+}
+
+button.action {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button.action:hover {
+    background: #1d4ed8;
+}
+
+button.danger {
+    background: #dc2626;
+}
+
+/* ORDER TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 13px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+}
+
+th {
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+/* SORT VISUALIZATION */
+.sort-area {
+    min-height: 220px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.bar {
+    width: 45px;
+    background: #2563eb;
+    color: white;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 7px;
+    transition: 0.3s;
+}
+
+.bar.active {
+    background: #f59e0b;
+    transform: translateY(-8px);
+}
+
+.bar.sorted {
+    background: #16a34a;
+}
+
+/* SEARCH */
+.search-result {
+    margin-top: 15px;
+    padding: 15px;
+    background: #eff6ff;
+    border-left: 5px solid #2563eb;
+    border-radius: 5px;
+}
+
+/* GRAPH */
+.graph {
+    position: relative;
+    height: 430px;
+    background: #f8fafc;
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+    margin-top: 20px;
+}
+
+.node {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 4px solid white;
+    box-shadow: 0 3px 10px rgba(0,0,0,.2);
+    transition: 0.5s;
+}
+
+.node.visited {
+    background: #16a34a;
+    transform: scale(1.15);
+}
+
+.node.current {
+    background: #f59e0b;
+}
+
+.line {
+    position: absolute;
+    height: 4px;
+    background: #94a3b8;
+    transform-origin: left center;
+}
+
+/* QUEUE */
+.queue {
+    display: flex;
+    gap: 8px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.queue-item {
+    min-width: 100px;
+    padding: 18px 10px;
+    background: #2563eb;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* INFO */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.info-box {
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border-left: 5px solid #2563eb;
+}
+
+.info-box h3 {
+    margin-bottom: 10px;
+}
+
+/* FOOTER */
+footer {
+    background: #101c36;
+    color: white;
+    text-align: center;
+    padding: 25px;
+    margin-top: 40px;
+}
+
+/* MOBILE */
+@media(max-width: 800px) {
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 28px;
+    }
+}
+
+@media(max-width: 500px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .bar {
+        width: 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🚚 SMART DELIVERY</h1>
+    <p>Route & Order Management System — DSA Algorithm Visualizer</p>
+    <p>Deliver Smarter • Search Faster • Sort Better</p>
+</header>
+
+<nav>
+    <button onclick="scrollToSection('orders')">📦 Orders</button>
+    <button onclick="scrollToSection('sorting')">🔢 Sorting</button>
+    <button onclick="scrollToSection('searching')">🔍 Searching</button>
+    <button onclick="scrollToSection('routes')">🗺️ Routes</button>
+    <button onclick="scrollToSection('queue')">📋 Queue</button>
+    <button onclick="scrollToSection('info')">📚 Algorithms</button>
+</nav>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+
+    <div class="card">
+        <h3>📦 Total Orders</h3>
+        <div class="number" id="totalOrders">5</div>
+    </div>
+
+    <div class="card">
+        <h3>🚚 Active Deliveries</h3>
+        <div class="number" id="activeOrders">3</div>
+    </div>
+
+    <div class="card">
+        <h3>📍 Locations</h3>
+        <div class="number">7</div>
+    </div>
+
+    <div class="card">
+        <h3>⚡ Priority Orders</h3>
+        <div class="number" id="priorityOrders">2</div>
+    </div>
+
+</div>
+
+
+<!-- ORDER MANAGEMENT -->
+
+<div class="section" id="orders">
+
+<h2>📦 Order Management</h2>
+
+<div class="controls">
+
+    <input type="text" id="orderID"
+           placeholder="Order ID e.g. D106">
+
+    <input type="number" id="distance"
+           placeholder="Distance (km)">
+
+    <select id="priority">
+        <option value="Normal">Normal</option>
+        <option value="High">High</option>
+        <option value="Urgent">Urgent</option>
+    </select>
+
+    <button class="action" onclick="addOrder()">
+        ➕ Add Order
+    </button>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+    <th>Order ID</th>
+    <th>Distance</th>
+    <th>Priority</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+</thead>
+
+<tbody id="orderTable"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- SORTING -->
+
+<div class="section" id="sorting">
+
+<h2>🔢 Sorting Algorithm Visualizer</h2>
+
+<div class="controls">
+
+<select id="sortAlgorithm">
+
+<option value="bubble">Bubble Sort</option>
+<option value="selection">Selection Sort</option>
+<option value="insertion">Insertion Sort</option>
+<option value="quick">Quick Sort</option>
+
+</select>
+
+<button class="action" onclick="startSort()">
+▶ Start Sorting
+</button>
+
+<button class="action" onclick="generateArray()">
+🔄 Generate Orders
+</button>
+
+</div>
+
+<div class="sort-area" id="sortArea"></div>
+
+<p id="sortInfo" style="margin-top:15px;"></p>
+
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="section" id="searching">
+
+<h2>🔍 Searching Algorithm Visualizer</h2>
+
+<div class="controls">
+
+<select id="searchAlgorithm">
+
+<option value="linear">Linear Search</option>
+<option value="binary">Binary Search</option>
+
+</select>
+
+<input type="text"
+       id="searchID"
+       placeholder="Enter Order ID">
+
+<button class="action" onclick="searchOrder()">
+🔎 Search
+</button>
+
+</div>
+
+<div class="search-result" id="searchResult">
+Search result will appear here.
+</div>
+
+</div>
+
+
+<!-- ROUTES -->
+
+<div class="section" id="routes">
+
+<h2>🗺️ Smart Delivery Route Finder</h2>
+
+<div class="controls">
+
+<button class="action" onclick="startBFS()">
+🌐 Start BFS
+</button>
+
+<button class="action" onclick="startDFS()">
+🌳 Start DFS
+</button>
+
+<button class="action" onclick="resetGraph()">
+🔄 Reset Map
+</button>
+
+</div>
+
+<div class="graph" id="graph">
+
+<!-- NODES -->
+
+<div class="node" id="A"
+     style="left:45%;top:8%;">W</div>
+
+<div class="node" id="B"
+     style="left:20%;top:28%;">A</div>
+
+<div class="node" id="C"
+     style="left:70%;top:28%;">B</div>
+
+<div class="node" id="D"
+     style="left:10%;top:55%;">C</div>
+
+<div class="node" id="E"
+     style="left:35%;top:55%;">D</div>
+
+<div class="node" id="F"
+     style="left:60%;top:55%;">E</div>
+
+<div class="node" id="G"
+     style="left:80%;top:55%;">F</div>
+
+<div class="node" id="H"
+     style="left:45%;top:80%;">Customer</div>
+
+<!-- CONNECTIONS -->
+
+<div class="line"
+style="left:48%;top:20%;width:145px;transform:rotate(155deg);"></div>
+
+<div class="line"
+style="left:51%;top:20%;width:145px;transform:rotate(25deg);"></div>
+
+<div class="line"
+style="left:22%;top:40%;width:100px;transform:rotate(120deg);"></div>
+
+<div class="line"
+style="left:25%;top:40%;width:90px;transform:rotate(50deg);"></div>
+
+<div class="line"
+style="left:73%;top:40%;width:90px;transform:rotate(125deg);"></div>
+
+<div class="line"
+style="left:75%;top:40%;width:90px;transform:rotate(55deg);"></div>
+
+<div class="line"
+style="left:43%;top:65%;width:100px;transform:rotate(65deg);"></div>
+
+</div>
+
+<p id="routeResult" style="margin-top:15px;font-weight:bold;"></p>
+
+</div>
+
+
+<!-- QUEUE -->
+
+<div class="section" id="queue">
+
+<h2>📋 Delivery Queue</h2>
+
+<div class="controls">
+
+<button class="action" onclick="enqueue()">
+➕ Add Next Order
+</button>
+
+<button class="action" onclick="dequeue()">
+🚚 Deliver Order
+</button>
+
+<button class="action danger" onclick="clearQueue()">
+🗑️ Clear Queue
+</button>
+
+</div>
+
+<div class="queue" id="queueArea"></div>
+
+</div>
+
+
+<!-- ALGORITHM INFORMATION -->
+
+<div class="section" id="info">
+
+<h2>📚 Algorithm Information</h2>
+
+<div class="info-grid">
+
+<div class="info-box">
+<h3>🫧 Bubble Sort</h3>
+<p>Repeatedly compares adjacent orders and swaps them.</p>
+<br>
+<b>Time:</b> O(n²)
+</div>
+
+<div class="info-box">
+<h3>🎯 Selection Sort</h3>
+<p>Finds the minimum element and places it at the correct position.</p>
+<br>
+<b>Time:</b> O(n²)
+</div>
+
+<div class="info-box">
+<h3>🃏 Insertion Sort</h3>
+<p>Builds a sorted list by inserting each order into its correct position.</p>
+<br>
+<b>Time:</b> O(n²)
+</div>
+
+<div class="info-box">
+<h3>⚡ Quick Sort</h3>
+<p>Uses a pivot to divide the order list into smaller sections.</p>
+<br>
+<b>Average:</b> O(n log n)
+</div>
+
+<div class="info-box">
+<h3>🔎 Linear Search</h3>
+<p>Checks every order one by one until the required order is found.</p>
+<br>
+<b>Time:</b> O(n)
+</div>
+
+<div class="info-box">
+<h3>🔍 Binary Search</h3>
+<p>Searches a sorted list by repeatedly dividing the search area.</p>
+<br>
+<b>Time:</b> O(log n)
+</div>
+
+<div class="info-box">
+<h3>🌐 BFS</h3>
+<p>Visits nearby delivery locations level by level.</p>
+<br>
+<b>Time:</b> O(V + E)
+</div>
+
+<div class="info-box">
+<h3>🌳 DFS</h3>
+<p>Explores one route deeply before moving to another route.</p>
+<br>
+<b>Time:</b> O(V + E)
+</div>
+
+<div class="info-box">
+<h3>📋 Queue</h3>
+<p>Uses FIFO: First In, First Out.</p>
+<br>
+<b>Application:</b> Delivery orders
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<footer>
+    <h3>🚚 Smart Delivery DSA Visualizer</h3>
+    <p>DSA Project | Sorting • Searching • Graph • Queue</p>
+    <p>Designed for Educational Purpose</p>
+</footer>
+
+
+<script>
+
+/* =========================
+   ORDER DATA
+========================= */
+
+let orders = [
+
+    {
+        id:"D101",
+        distance:8,
+        priority:"Normal",
+        status:"Pending"
+    },
+
+    {
+        id:"D102",
+        distance:3,
+        priority:"High",
+        status:"Pending"
+    },
+
+    {
+        id:"D103",
+        distance:12,
+        priority:"Normal",
+        status:"Pending"
+    },
+
+    {
+        id:"D104",
+        distance:5,
+        priority:"Urgent",
+        status:"Pending"
+    },
+
+    {
+        id:"D105",
+        distance:2,
+        priority:"High",
+        status:"Pending"
+    }
+
+];
+
+
+/* DISPLAY ORDERS */
+
+function displayOrders(){
+
+    const table =
+        document.getElementById("orderTable");
+
+    table.innerHTML = "";
+
+    orders.forEach((order,index)=>{
+
+        table.innerHTML += `
+
+        <tr>
+
+        <td>${order.id}</td>
+
+        <td>${order.distance} km</td>
+
+        <td>${order.priority}</td>
+
+        <td>${order.status}</td>
+
+        <td>
+
+        <button class="action"
+        onclick="deliver(${index})">
+
+        🚚 Deliver
+
+        </button>
+
+        </td>
+
+        </tr>
+
+        `;
+
+    });
+
+    updateDashboard();
+}
+
+
+/* DASHBOARD */
+
+function updateDashboard(){
+
+    document.getElementById("totalOrders")
+    .innerText = orders.length;
+
+    document.getElementById("activeOrders")
+    .innerText =
+        orders.filter(o=>o.status==="Pending").length;
+
+    document.getElementById("priorityOrders")
+    .innerText =
+        orders.filter(
+            o=>o.priority==="High" ||
+               o.priority==="Urgent"
+        ).length;
+}
+
+
+/* ADD ORDER */
+
+function addOrder(){
+
+    let id =
+        document.getElementById("orderID").value;
+
+    let distance =
+        Number(document.getElementById("distance").value);
+
+    let priority =
+        document.getElementById("priority").value;
+
+    if(id==="" || distance<=0){
+
+        alert("Please enter valid order details.");
+
+        return;
+    }
+
+    orders.push({
+
+        id:id,
+        distance:distance,
+        priority:priority,
+        status:"Pending"
+
+    });
+
+    displayOrders();
+
+    document.getElementById("orderID").value="";
+    document.getElementById("distance").value="";
+}
+
+
+/* DELIVER ORDER */
+
+function deliver(index){
+
+    orders[index].status="Delivered";
+
+    displayOrders();
+}
+
+
+/* =========================
+   SORTING
+========================= */
+
+let numbers =
+    orders.map(order=>order.distance);
+
+
+function generateArray(){
+
+    numbers =
+        orders.map(order=>order.distance);
+
+    renderBars();
+}
+
+
+function renderBars(active=[]){
+
+    const area =
+        document.getElementById("sortArea");
+
+    area.innerHTML="";
+
+    numbers.forEach((num,index)=>{
+
+        let bar =
+            document.createElement("div");
+
+        bar.className="bar";
+
+        if(active.includes(index))
+            bar.classList.add("active");
+
+        bar.style.height =
+            (num*12+30)+"px";
+
+        bar.innerText=num;
+
+        area.appendChild(bar);
+
+    });
+
+}
+
+
+async function startSort(){
+
+    generateArray();
+
+    let algorithm =
+        document.getElementById("sortAlgorithm").value;
+
+    if(algorithm==="bubble")
+        await bubbleSort();
+
+    else if(algorithm==="selection")
+        await selectionSort();
+
+    else if(algorithm==="insertion")
+        await insertionSort();
+
+    else
+        await quickSort(0,numbers.length-1);
+
+    renderBars();
+
+    document.getElementById("sortInfo")
+        .innerHTML =
+        "<b>Sorting completed successfully!</b>";
+
+}
+
+
+/* BUBBLE SORT */
+
+async function bubbleSort(){
+
+    for(let i=0;i<numbers.length;i++){
+
+        for(let j=0;j<numbers.length-i-1;j++){
+
+            renderBars([j,j+1]);
+
+            await sleep(500);
+
+            if(numbers[j]>numbers[j+1]){
+
+                let temp=numbers[j];
+
+                numbers[j]=numbers[j+1];
+
+                numbers[j+1]=temp;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* SELECTION SORT */
+
+async function selectionSort(){
+
+    for(let i=0;i<numbers.length;i++){
+
+        let min=i;
+
+        for(let j=i+1;j<numbers.length;j++){
+
+            renderBars([min,j]);
+
+            await sleep(500);
+
+            if(numbers[j]<numbers[min])
+                min=j;
+
+        }
+
+        let temp=numbers[i];
+
+        numbers[i]=numbers[min];
+
+        numbers[min]=temp;
+
+    }
+
+}
+
+
+/* INSERTION SORT */
+
+async function insertionSort(){
+
+    for(let i=1;i<numbers.length;i++){
+
+        let key=numbers[i];
+
+        let j=i-1;
+
+        while(j>=0 && numbers[j]>key){
+
+            numbers[j+1]=numbers[j];
+
+            renderBars([j,j+1]);
+
+            await sleep(500);
+
+            j--;
+
+        }
+
+        numbers[j+1]=key;
+
+    }
+
+}
+
+
+/* QUICK SORT */
+
+async function quickSort(low,high){
+
+    if(low<high){
+
+        let p =
+            await partition(low,high);
+
+        await quickSort(low,p-1);
+
+        await quickSort(p+1,high);
+
+    }
+
+}
+
+
+async function partition(low,high){
+
+    let pivot=numbers[high];
+
+    let i=low-1;
+
+    for(let j=low;j<high;j++){
+
+        renderBars([j,high]);
+
+        await sleep(400);
+
+        if(numbers[j]<pivot){
+
+            i++;
+
+            let temp=numbers[i];
+
+            numbers[i]=numbers[j];
+
+            numbers[j]=temp;
+
+        }
+
+    }
+
+    let temp=numbers[i+1];
+
+    numbers[i+1]=numbers[high];
+
+    numbers[high]=temp;
+
+    return i+1;
+
+}
+
+
+/* =========================
+   SEARCHING
+========================= */
+
+async function searchOrder(){
+
+    let id =
+        document.getElementById("searchID").value
+        .trim();
+
+    let algorithm =
+        document.getElementById("searchAlgorithm").value;
+
+    let result =
+        document.getElementById("searchResult");
+
+    if(id===""){
+
+        result.innerHTML="Please enter an Order ID.";
+
+        return;
+    }
+
+    if(algorithm==="linear"){
+
+        for(let i=0;i<orders.length;i++){
+
+            if(orders[i].id===id){
+
+                result.innerHTML=
+                `✅ <b>Order Found!</b><br>
+                Order ID: ${id}<br>
+                Position: ${i+1}<br>
+                Comparisons: ${i+1}`;
+
+                return;
+
+            }
+
+        }
+
+        result.innerHTML="❌ Order not found.";
+
+    }
+
+    else{
+
+        let sorted =
+            [...orders].sort(
+                (a,b)=>
+                a.id.localeCompare(b.id)
+            );
+
+        let low=0;
+
+        let high=sorted.length-1;
+
+        let comparisons=0;
+
+        while(low<=high){
+
+            let mid=
+                Math.floor((low+high)/2);
+
+            comparisons++;
+
+            if(sorted[mid].id===id){
+
+                result.innerHTML=
+                `✅ <b>Order Found using Binary Search!</b><br>
+                Order ID: ${id}<br>
+                Comparisons: ${comparisons}`;
+
+                return;
+
+            }
+
+            if(sorted[mid].id<id)
+                low=mid+1;
+
+            else
+                high=mid-1;
+
+        }
+
+        result.innerHTML=
+        "❌ Order not found.";
+
+    }
+
+}
+
+
+/* =========================
+   GRAPH
+========================= */
+
+const graph={
+
+    A:["B","C"],
+
+    B:["A","D","E"],
+
+    C:["A","F","G"],
+
+    D:["B"],
+
+    E:["B","H"],
+
+    F:["C"],
+
+    G:["C"],
+
+    H:["E"]
+
+};
+
+
+/* RESET */
+
+function resetGraph(){
+
+    document.querySelectorAll(".node")
+        .forEach(node=>{
+            node.classList.remove(
+                "visited",
+                "current"
+            );
+        });
+
+    document.getElementById("routeResult")
+        .innerText="";
+}
+
+
+/* BFS */
+
+async function startBFS(){
+
+    resetGraph();
+
+    let queue=["A"];
+
+    let visited=new Set();
+
+    let order=[];
+
+    while(queue.length){
+
+        let node=queue.shift();
+
+        if(visited.has(node))
+            continue;
+
+        visited.add(node);
+
+        order.push(node);
+
+        let element=
+            document.getElementById(node);
+
+        element.classList.add("current");
+
+        await sleep(700);
+
+        element.classList.remove("current");
+
+        element.classList.add("visited");
+
+        for(let next of graph[node]){
+
+            if(!visited.has(next))
+                queue.push(next);
+
+        }
+
+    }
+
+    document.getElementById("routeResult")
+        .innerText =
+        "🌐 BFS Route: " +
+        order.join(" → ");
+
+}
+
+
+/* DFS */
+
+async function startDFS(){
+
+    resetGraph();
+
+    let visited=new Set();
+
+    let order=[];
+
+    async function dfs(node){
+
+        visited.add(node);
+
+        order.push(node);
+
+        let element=
+            document.getElementById(node);
+
+        element.classList.add("current");
+
+        await sleep(700);
+
+        element.classList.remove("current");
+
+        element.classList.add("visited");
+
+        for(let next of graph[node]){
+
+            if(!visited.has(next)){
+
+                await dfs(next);
+
+            }
+
+        }
+
+    }
+
+    await dfs("A");
+
+    document.getElementById("routeResult")
+        .innerText =
+        "🌳 DFS Route: " +
+        order.join(" → ");
+
+}
+
+
+/* =========================
+   QUEUE
+========================= */
+
+let deliveryQueue=[
+    "D101",
+    "D102",
+    "D103"
+];
+
+
+function renderQueue(){
+
+    let area=
+        document.getElementById("queueArea");
+
+    area.innerHTML="";
+
+    deliveryQueue.forEach((item,index)=>{
+
+        area.innerHTML += `
+
+        <div class="queue-item">
+
+        ${item}
+
+        ${index===0 ?
+        "<br><small>FRONT</small>":
+        ""}
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+function enqueue(){
+
+    let next =
+        "D"+(106+deliveryQueue.length);
+
+    deliveryQueue.push(next);
+
+    renderQueue();
+
+}
+
+
+function dequeue(){
+
+    if(deliveryQueue.length===0){
+
+        alert("Queue is empty!");
+
+        return;
+
+    }
+
+    let delivered=
+        deliveryQueue.shift();
+
+    alert(
+        delivered +
+        " has been delivered!"
+    );
+
+    renderQueue();
+
+}
+
+
+function clearQueue(){
+
+    deliveryQueue=[];
+
+    renderQueue();
+
+}
+
+
+/* =========================
+   UTILITY
+========================= */
+
+function sleep(ms){
+
+    return new Promise(
+        resolve=>setTimeout(resolve,ms)
+    );
+
+}
+
+
+function scrollToSection(id){
+
+    document.getElementById(id)
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+
+/* INITIAL DISPLAY */
+
+displayOrders();
+
+generateArray();
+
+renderQueue();
+
+</script>
+
+</body>
+</html>
